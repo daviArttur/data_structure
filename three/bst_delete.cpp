@@ -3,14 +3,14 @@
 using namespace std;
 
 struct Node {
-    int key;
+    int data;
     int lvl;
     Node *left;
     Node *right;
     
     
     Node(int n, int l) {
-        key = n;
+        data = n;
         lvl = l;
     }
 };
@@ -21,38 +21,51 @@ void inOrder(Node *n) {
         inOrder(n->left);
     }
     
-    cout << "key: " << n->key << " lvl: " << n->lvl << endl;
+    cout << "key: " << n->data << " lvl: " << n->lvl << endl;
     
     if (n->right) {
         inOrder(n->right);
     }
 }
 
+Node* FindMin(Node* root)
+{
+	while(root->left != NULL) root = root->left;
+	return root;
+}
 
-Node* deleteNode(Node *root, int key) {
+
+Node* Delete(Node *root, int data) {
     
-    if(root == nullptr) {
-        return root;
-    }
-    else if(key > root->key) {
-        root = deleteNode(root->right, key);
-    } 
-    else if(key < root->key) {
-        root = deleteNode(root->left, key);
-    } else {
-        if(root->left == nullptr && root->right == nullptr) {
-            delete root;
-            root = NULL;
-        } else if(root->left == nullptr) {
-            cout << "AQUI " << root->key << endl;
-            root = root->right;
-        } else if(root->right == nullptr) {
-            root = root->left;
-        }
-        return root;
-    }
-    
-    return root;
+if(root == NULL) return root; 
+	else if(data < root->data) root->left = Delete(root->left,data);
+	else if (data > root->data) root->right = Delete(root->right,data);
+
+	else {
+		
+		if(root->left == NULL && root->right == NULL) { 
+			delete root;
+			root = NULL;
+		}
+	
+		else if(root->left == NULL) {
+			struct Node *temp = root;
+			root = root->right;
+			delete temp;
+		}
+		else if(root->right == NULL) {
+			struct Node *temp = root;
+			root = root->left;
+			delete temp;
+		}
+	
+		else { 
+			struct Node *temp = FindMin(root->right);
+			root->data = temp->data;
+			root->right = Delete(root->right,temp->data);
+		}
+	}
+	return root;
 }
 
 int main()
@@ -65,7 +78,7 @@ int main()
     root->left->right = new Node(4, 3);
     root->left->left = new Node(2, 3);
     
-    deleteNode(root, 7);
+   Delete(root, 7);
     inOrder(root);
     return 0;
 }
